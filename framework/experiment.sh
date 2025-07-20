@@ -150,7 +150,7 @@ python "$SCRIPT_DIR/report_generator.py" \
     --wasm-size "$WASM_SIZE" \
     --predictions "$PREDICTIONS_OUTPUT" \
     --accuracy "$ACCURACY_OUTPUT" \
-    --em-flags "$EM_FLAGS" \
+    --em-flags="$EM_FLAGS" \
     --output "$REPORT_OUTPUT"
 
 echo -e "      ${GREEN}✓ Report saved: $REPORT_OUTPUT${NC}"

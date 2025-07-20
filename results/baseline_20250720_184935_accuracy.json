@@ -1,0 +1,35 @@
+{
+  "comparison_against": "baseline.cbm",
+  "predictions_file": "/Users/yuehu/agent-code/catboost-optimize/results/baseline_20250720_184935_predictions.json",
+  "total_samples": 1000000,
+  "samples_compared": 1000,
+  "metrics": {
+    "n_samples_compared": 1000,
+    "exact_matches_ratio": 0.0,
+    "max_absolute_error": 9444.98046875,
+    "mean_absolute_error": 2459.132080078125,
+    "rmse": 2920.67578125,
+    "mean_relative_error": 0.8490728735923767,
+    "error_percentiles": {
+      "p50": 2216.842041015625,
+      "p90": 4545.075732421875,
+      "p95": 5204.20390625,
+      "p99": 7642.016689453125,
+      "p99.9": 8582.539085937578
+    },
+    "relative_error_percentiles": {
+      "p50": 0.5872908234596252,
+      "p90": 1.9029081821441651,
+      "p95": 2.393491494655609,
+      "p99": 4.2966285419464105
+    },
+    "regression_detected": true,
+    "error_distribution": {
+      "below_0.0001": 0,
+      "below_0.001": 0,
+      "below_0.01": 0,
+      "below_0.1": 0,
+      "above_0.1": 1000
+    }
+  }
+}
