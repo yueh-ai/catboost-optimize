@@ -1,0 +1,103 @@
+{
+  "features": [
+    "carat",
+    "cut",
+    "color",
+    "clarity",
+    "depth",
+    "table",
+    "x",
+    "y",
+    "z"
+  ],
+  "categorical_features": [
+    "cut",
+    "color",
+    "clarity"
+  ],
+  "numeric_features": [
+    "carat",
+    "depth",
+    "table",
+    "x",
+    "y",
+    "z"
+  ],
+  "feature_ranges": {
+    "carat": {
+      "min": 0.2,
+      "max": 5.01,
+      "mean": 0.7979397478680014,
+      "std": 0.47401124440538067
+    },
+    "depth": {
+      "min": 43.0,
+      "max": 79.0,
+      "mean": 61.749404894327036,
+      "std": 1.4326213188337733
+    },
+    "table": {
+      "min": 43.0,
+      "max": 95.0,
+      "mean": 57.45718390804598,
+      "std": 2.234490562820938
+    },
+    "x": {
+      "min": 0.0,
+      "max": 10.74,
+      "mean": 5.731157211716722,
+      "std": 1.1217607467924422
+    },
+    "y": {
+      "min": 0.0,
+      "max": 58.9,
+      "mean": 5.734525954764553,
+      "std": 1.1421346741235396
+    },
+    "z": {
+      "min": 0.0,
+      "max": 31.8,
+      "mean": 3.5387337782721544,
+      "std": 0.7056988469499973
+    }
+  },
+  "categorical_values": {
+    "cut": [
+      "Ideal",
+      "Premium",
+      "Good",
+      "Very Good",
+      "Fair"
+    ],
+    "color": [
+      "E",
+      "I",
+      "J",
+      "H",
+      "F",
+      "G",
+      "D"
+    ],
+    "clarity": [
+      "SI2",
+      "SI1",
+      "VS1",
+      "VS2",
+      "VVS2",
+      "VVS1",
+      "I1",
+      "IF"
+    ]
+  },
+  "model_params": {
+    "iterations": 999,
+    "depth": 6,
+    "learning_rate": 0.03
+  },
+  "performance": {
+    "train_r2": 0.9845206507430636,
+    "test_r2": 0.9822931594286068,
+    "train_samples": 43152,
+    "test_samples": 10788
+  }
+}
