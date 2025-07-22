@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# CatBoost WASM Optimization Experiment Runner
-# This script provides an easy interface to run optimization experiments
+# Simplified CatBoost WASM Optimization Experiment Runner
+# This script compiles and runs the optimization experiment without batching
 
 # Colors for output
 RED='\033[0;31m'
@@ -10,15 +10,14 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Default values
-WRAPPER="./experiments/batch_wrapper.cpp"
+WRAPPER="./experiments/wrapper.cpp"
 EMFLAGS="-O3"
-BATCH_SIZES="1 10 100 1000 5000 10000"
-TEST_DATA="./test_data/test_data_1M.bin"
+TEST_DATA="./models/test_data.bin"
 OUTPUT_DIR="./experiment_results"
 
 # Function to display usage
 usage() {
-    echo "CatBoost WASM Optimization Experiment Runner"
+    echo "CatBoost WASM Optimization Experiment Runner (Simplified)"
     echo ""
     echo "Usage: $0 [OPTIONS]"
     echo ""
@@ -27,32 +26,24 @@ usage() {
     echo "  -n, --name NAME          Experiment name (default: auto-generated)"
     echo "  -w, --wrapper FILE       Path to wrapper C++ file (default: $WRAPPER)"
     echo "  -e, --emflags FLAGS      Emscripten compiler flags (default: $EMFLAGS)"
-    echo "  -b, --batch-sizes SIZES  Space-separated batch sizes (default: $BATCH_SIZES)"
     echo "  -d, --data FILE          Test data file (default: $TEST_DATA)"
     echo "  -o, --output DIR         Output directory (default: $OUTPUT_DIR)"
     echo "  --simd                   Enable SIMD optimizations"
-    echo "  --threads                Enable threading support"
-    echo "  --no-batch-api          Disable batch API usage"
     echo ""
     echo "Examples:"
     echo "  # Run with default settings"
     echo "  $0"
     echo ""
-    echo "  # Run with custom name and SIMD enabled"
-    echo "  $0 --name simd_test --simd"
+    echo "  # Run with custom wrapper and SIMD"
+    echo "  $0 --wrapper ./my_optimized_wrapper.cpp --simd"
     echo ""
-    echo "  # Run with aggressive optimization flags"
-    echo "  $0 --emflags \"-O3 -flto\" --name aggressive_opt"
-    echo ""
-    echo "  # Test custom wrapper with specific batch sizes"
-    echo "  $0 --wrapper ./my_wrapper.cpp --batch-sizes \"100 1000 10000\""
+    echo "  # Run with aggressive optimization"
+    echo "  $0 --emflags \"-O3 -flto --closure 1\" --name aggressive_opt"
 }
 
 # Parse command line arguments
 EXPERIMENT_NAME=""
 SIMD_FLAG=""
-THREADS_FLAG=""
-USE_BATCH_API="--use-batch-api"
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -72,10 +63,6 @@ while [[ $# -gt 0 ]]; do
             EMFLAGS="$2"
             shift 2
             ;;
-        -b|--batch-sizes)
-            BATCH_SIZES="$2"
-            shift 2
-            ;;
         -d|--data)
             TEST_DATA="$2"
             shift 2
@@ -85,15 +72,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --simd)
-            SIMD_FLAG="--simd"
-            shift
-            ;;
-        --threads)
-            THREADS_FLAG="--threads"
-            shift
-            ;;
-        --no-batch-api)
-            USE_BATCH_API=""
+            SIMD_FLAG="-msimd128"
             shift
             ;;
         *)
@@ -106,7 +85,7 @@ done
 
 # Generate experiment name if not provided
 if [ -z "$EXPERIMENT_NAME" ]; then
-    EXPERIMENT_NAME="exp_$(date +%Y%m%d_%H%M%S)"
+    EXPERIMENT_NAME="exp_$(date +%s)"
 fi
 
 # Check if required files exist
@@ -141,54 +120,58 @@ if ! command -v emcc &> /dev/null; then
     exit 1
 fi
 
+# Create experiment directory
+EXPERIMENT_DIR="$OUTPUT_DIR/$EXPERIMENT_NAME"
+mkdir -p "$EXPERIMENT_DIR"
+
 # Display experiment configuration
-echo -e "${GREEN}Starting CatBoost WASM Optimization Experiment${NC}"
+echo -e "${GREEN}Starting CatBoost WASM Optimization Experiment (Simplified)${NC}"
 echo -e "Experiment name: ${YELLOW}$EXPERIMENT_NAME${NC}"
 echo -e "Wrapper: ${YELLOW}$WRAPPER${NC}"
-echo -e "Emscripten flags: ${YELLOW}$EMFLAGS${NC}"
-echo -e "Batch sizes: ${YELLOW}$BATCH_SIZES${NC}"
+echo -e "Emscripten flags: ${YELLOW}$EMFLAGS $SIMD_FLAG${NC}"
 echo -e "Test data: ${YELLOW}$TEST_DATA${NC}"
-echo -e "Output directory: ${YELLOW}$OUTPUT_DIR${NC}"
-
-if [ -n "$SIMD_FLAG" ]; then
-    echo -e "SIMD: ${YELLOW}Enabled${NC}"
-fi
-
-if [ -n "$THREADS_FLAG" ]; then
-    echo -e "Threading: ${YELLOW}Enabled${NC}"
-fi
-
+echo -e "Output directory: ${YELLOW}$EXPERIMENT_DIR${NC}"
 echo ""
 
-# Convert batch sizes to array format for Node.js
-BATCH_ARRAY=""
-for size in $BATCH_SIZES; do
-    if [ -z "$BATCH_ARRAY" ]; then
-        BATCH_ARRAY="$size"
-    else
-        BATCH_ARRAY="$BATCH_ARRAY $size"
-    fi
-done
+# Compile the WASM module
+echo -e "${GREEN}Compiling WASM module...${NC}"
+emcc $WRAPPER \
+    -o "$EXPERIMENT_DIR/model.js" \
+    $EMFLAGS \
+    $SIMD_FLAG \
+    -s WASM=1 \
+    -s EXPORTED_FUNCTIONS='["_catboostPredictAll", "_catboostPredict", "_malloc", "_free"]' \
+    -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap", "HEAP8", "HEAP16", "HEAP32", "HEAPU8", "HEAPU16", "HEAPU32", "HEAPF32", "HEAPF64"]' \
+    -s ALLOW_MEMORY_GROWTH=1 \
+    -s MODULARIZE=1 \
+    -s EXPORT_NAME="Module" \
+    -s ENVIRONMENT='node'
+
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Compilation failed!${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}Compilation successful!${NC}"
+echo ""
 
 # Run the experiment
-node experiment_runner.js \
-    --name "$EXPERIMENT_NAME" \
-    --wrapper "$WRAPPER" \
-    --emflags "$EMFLAGS" \
-    --batch-sizes $BATCH_ARRAY \
-    --test-data "$TEST_DATA" \
-    --output-dir "$OUTPUT_DIR" \
-    $SIMD_FLAG \
-    $THREADS_FLAG \
-    $USE_BATCH_API
+echo -e "${GREEN}Running experiment...${NC}"
+node experiment_runner.js "$EXPERIMENT_NAME"
 
 # Check if experiment was successful
 if [ $? -eq 0 ]; then
     echo ""
     echo -e "${GREEN}Experiment completed successfully!${NC}"
-    echo -e "Results saved to: ${YELLOW}$OUTPUT_DIR/$EXPERIMENT_NAME/results.json${NC}"
+    echo -e "Results saved to: ${YELLOW}$EXPERIMENT_DIR/results.json${NC}"
+    
+    # Display results
+    if [ -f "$EXPERIMENT_DIR/results.json" ]; then
+        echo ""
+        echo -e "${GREEN}Results:${NC}"
+        cat "$EXPERIMENT_DIR/results.json"
+    fi
 else
     echo ""
     echo -e "${RED}Experiment failed!${NC}"
-    echo -e "Check error log at: ${YELLOW}$OUTPUT_DIR/$EXPERIMENT_NAME/error.json${NC}"
 fi
