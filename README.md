@@ -1,162 +1,81 @@
-# CatBoost WebWorker Experimentation Framework
+# CatBoost WebAssembly Optimization Framework
 
-A streamlined framework for optimizing CatBoost models running in WebAssembly (WASM) within web workers. Test different C++ optimization strategies and measure their impact on performance and accuracy.
+A streamlined framework for optimizing CatBoost models running in WebAssembly. Test different C++ optimization strategies and measure their impact on performance.
 
 ## Quick Start
 
+### Prerequisites
+- Node.js (v14+)
+- Python with uv package manager
+- Emscripten SDK installed at `/Users/yuehu/opensources/emsdk`
+
+### Installation
+
 ```bash
-# 1. Install dependencies
-uv sync
+# Clone the repository
+git clone https://github.com/yourusername/catboost-optimize.git
+cd catboost-optimize
 
-# 2. Train model and generate test data (one-time setup)
-cd setup
-python train_model.py
-python generate_test_data.py
-cd ..
+# Install Node.js dependencies
+npm install
 
-# 3. Run an experiment
-./framework/experiment.sh models/baseline.cpp
+# Install Python dependencies (using uv)
+uv pip install -r pyproject.toml
 ```
 
-## Features
+### Basic Usage
 
-- **One-command testing**: Modify C++ code, run one command, get comprehensive results
-- **Performance metrics**: Predictions per second, batch size optimization, memory usage
-- **Accuracy validation**: Compare against ground truth with detailed error analysis
-- **Visual reports**: Automatic generation of performance plots and summaries
-- **WebWorker ready**: Test real-world WASM performance in browser environments
+```bash
+# Run experiment with default settings
+./run_experiment.sh
+
+# Test with custom batch sizes
+./run_experiment.sh --name my_test --batch-sizes "100 1000 10000"
+
+# Enable SIMD optimizations
+./run_experiment.sh --name simd_test --simd
+
+# Use aggressive compiler optimizations
+./run_experiment.sh --name fast --emflags "-O3 -flto"
+```
+
+### Results
+
+Experiments output:
+- Performance metrics (predictions/second)
+- Accuracy comparison
+- Optimal batch size recommendations
+
+Results are saved to `experiment_results/<experiment_name>/results.json`
 
 ## Project Structure
 
 ```
 catboost-optimize/
-├── setup/                      # Model training and test data generation
-│   ├── train_model.py         # Train CatBoost on Diamonds dataset
-│   └── generate_test_data.py  # Generate 1M test vectors
-├── models/                     # Model files and test data
-│   ├── baseline.cpp           # CatBoost C++ export
-│   ├── baseline.cbm           # Native CatBoost model (ground truth)
-│   └── test_data.bin          # 1M test vectors (binary)
-├── framework/                  # Core experimentation tools
-│   ├── experiment.sh          # Main experiment runner
-│   ├── compile_wasm.js        # Emscripten wrapper
-│   ├── run_predictions.js     # WASM execution engine
-│   └── accuracy_checker.py    # Accuracy validation
-├── experiments/               # Your optimized models go here
-│   └── example_simd.cpp      # Example optimization
-└── results/                   # Experiment outputs
-    └── experiment_*.json      # Detailed results
+├── models/                 # CatBoost model files
+│   ├── baseline.cpp       # Exported C++ model
+│   └── baseline.cbm       # Original CatBoost model
+├── experiments/           # C++ wrapper implementations
+│   └── batch_wrapper.cpp  # Optimized batch processing wrapper
+├── test_data/            # Test datasets
+│   └── test_data_1M.bin  # 1M sample test data
+├── setup/                # Model training and data generation
+├── run_experiment.sh     # Main experiment runner
+└── experiment_runner.js  # Core experiment engine
 ```
 
-## Usage Examples
+## Key Features
 
-### Basic Experiment
+- **Flexible Wrapper System**: Test different C++ implementations
+- **Batch Processing**: Optimize prediction throughput
+- **Compiler Optimizations**: Support for SIMD, threading, and custom flags
+- **Automated Testing**: Compare performance across configurations
+- **Detailed Metrics**: Track speed, accuracy, and memory usage
 
-```bash
-# Test your optimized model
-./framework/experiment.sh experiments/my_optimized_model.cpp
-```
+## Documentation
 
-### Advanced Options
-
-```bash
-# Test different batch sizes
-./framework/experiment.sh my_model.cpp --batch-sizes=1,10,100,1000,10000
-
-# Custom compilation flags
-./framework/experiment.sh my_model.cpp --em-flags="-O3 -msimd128"
-
-# Named experiment
-./framework/experiment.sh my_model.cpp --name=simd_v2_test
-```
-
-### Visualize Results
-
-```bash
-# Generate performance plots
-python framework/visualize_results.py results/experiment_20240120_153045_report.json
-```
-
-## Writing Optimizations
-
-1. Start with the baseline model in `models/baseline.cpp`
-2. Create your optimized version in `experiments/`
-3. Common optimizations to try:
-   - SIMD vectorization
-   - Loop unrolling
-   - Memory access patterns
-   - Batch processing
-   - Precision adjustments
-
-Example structure:
-```cpp
-extern "C" {
-    float catboostPredict(const float* features, int featureCount) {
-        // Your optimized prediction logic here
-    }
-}
-```
-
-## Understanding Results
-
-### Performance Metrics
-- **Predictions/second**: Primary performance metric
-- **Best batch size**: Optimal batch size for your implementation
-- **Speedup vs baseline**: Performance improvement factor
-
-### Accuracy Metrics
-- **Max absolute error**: Largest prediction difference
-- **Mean absolute error**: Average prediction difference
-- **RMSE**: Root mean square error
-- **Exact matches**: Percentage of bit-exact predictions
-
-### Example Report
-```json
-{
-  "performance": {
-    "predictions_per_second": 1176470,
-    "speedup_vs_baseline": 3.2
-  },
-  "accuracy": {
-    "max_absolute_error": 0.0001,
-    "exact_matches_ratio": 0.95
-  }
-}
-```
-
-## Environment Requirements
-
-- **Python**: 3.10+ with uv package manager
-- **Node.js**: 20.x LTS (minimum 18.3)
-- **Emscripten**: 4.0.9+ (configured at `/Users/yuehu/opensources/emsdk`)
-
-## Troubleshooting
-
-### Emscripten not found
-Update the path in `framework/experiment.sh`:
-```bash
-source /path/to/your/emsdk/emsdk_env.sh
-```
-
-### Test data not generated
-```bash
-cd setup
-python train_model.py
-python generate_test_data.py
-```
-
-### Compilation errors
-Check your C++ syntax and ensure the exported function signature matches:
-```cpp
-extern "C" float catboostPredict(const float* features, int featureCount)
-```
-
-## Contributing
-
-1. Test your optimizations thoroughly
-2. Document any new compilation flags or techniques
-3. Share successful optimization strategies
+For detailed usage and development information, see [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)
 
 ## License
 
-This experimentation framework is provided as-is for research and optimization purposes.
+MIT License - see LICENSE file for details

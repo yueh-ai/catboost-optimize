@@ -1,0 +1,23 @@
+{
+  "name": "catboost-optimize",
+  "version": "1.0.0",
+  "description": "A streamlined framework for optimizing CatBoost models running in WebAssembly (WASM) within web workers. Test different C++ optimization strategies and measure their impact on performance and accuracy.",
+  "main": "experiment_runner.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yueh-ai/catboost-optimize.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yueh-ai/catboost-optimize/issues"
+  },
+  "homepage": "https://github.com/yueh-ai/catboost-optimize#readme",
+  "dependencies": {
+    "yargs": "^18.0.0"
+  }
+}
