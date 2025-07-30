@@ -21,7 +21,7 @@ for (let i = 0; i < args.length; i += 2) {
 }
 
 if (!options.input || !options.output) {
-    console.error('Usage: node compile_wasm.js --input <cpp_file> --output <js_output> [--flags "-O3"]');
+    console.error('Usage: node simple_compile_wasm.js --input <cpp_file> --output <js_output> [--flags "-O3"]');
     process.exit(1);
 }
 
@@ -36,65 +36,8 @@ if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// Create temporary wrapper file
-const tempDir = '/tmp';
-const wrapperPath = path.join(tempDir, `catboost_wrapper_${Date.now()}.cpp`);
-const wrapperContent = `#include <vector>
-#include <string>
-#include <cmath>
-
-// Include the generated model file
-#include "${path.resolve(options.input)}"
-
-// Mapping from encoded values to string values
-const char* cutValues[] = {"Ideal", "Premium", "Good", "Very Good", "Fair"};
-const char* colorValues[] = {"E", "I", "J", "H", "F", "G", "D"};
-const char* clarityValues[] = {"SI2", "SI1", "VS1", "VS2", "VVS2", "VVS1", "I1", "IF"};
-
-// External C interface for WASM
-extern "C" {
-    double catboostPredict(float* allFeatures, size_t totalFeatureCount) {
-        // The model expects 6 float features and 3 categorical features
-        const size_t floatFeatureCount = 6;
-        
-        // Extract float features (first 6)
-        std::vector<float> floatFeatures(allFeatures, allFeatures + floatFeatureCount);
-        
-        // Extract and decode categorical features (last 3)
-        std::vector<std::string> catFeatures;
-        
-        // Feature 6: cut
-        int cutIdx = (int)std::round(allFeatures[6]);
-        if (cutIdx >= 0 && cutIdx < 5) {
-            catFeatures.push_back(cutValues[cutIdx]);
-        } else {
-            catFeatures.push_back("Good"); // default
-        }
-        
-        // Feature 7: color
-        int colorIdx = (int)std::round(allFeatures[7]);
-        if (colorIdx >= 0 && colorIdx < 7) {
-            catFeatures.push_back(colorValues[colorIdx]);
-        } else {
-            catFeatures.push_back("G"); // default
-        }
-        
-        // Feature 8: clarity
-        int clarityIdx = (int)std::round(allFeatures[8]);
-        if (clarityIdx >= 0 && clarityIdx < 8) {
-            catFeatures.push_back(clarityValues[clarityIdx]);
-        } else {
-            catFeatures.push_back("SI1"); // default
-        }
-        
-        return ApplyCatboostModel(floatFeatures, catFeatures);
-    }
-}`;
-
-fs.writeFileSync(wrapperPath, wrapperContent);
-
-// Build emcc command
-const emccCommand = `emcc ${wrapperPath} \
+// Build emcc command - compile the C++ file directly without wrapper
+const emccCommand = `emcc ${options.input} \
     -o ${options.output} \
     ${options.flags} \
     -std=c++20 \
@@ -135,14 +78,5 @@ try {
 } catch (error) {
     console.error('❌ Compilation failed:');
     console.error(error.message);
-    // Clean up temporary wrapper file
-    if (fs.existsSync(wrapperPath)) {
-        fs.unlinkSync(wrapperPath);
-    }
     process.exit(1);
-} finally {
-    // Clean up temporary wrapper file
-    if (fs.existsSync(wrapperPath)) {
-        fs.unlinkSync(wrapperPath);
-    }
 }

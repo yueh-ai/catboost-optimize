@@ -1,0 +1,19 @@
+{
+  "experiment_name": "baseline_wrapper_20250729_221508",
+  "cpp_file": "experiments/baseline_wrapper.cpp",
+  "timestamp": "2025-07-30T03:15:23.805Z",
+  "total_samples": 1000000,
+  "total_time_ms": 10913,
+  "worker_time_ms": 10773,
+  "predictions_per_second": 91633,
+  "speedup_vs_baseline": 1.0,
+  "wasm_size_bytes": 527103,
+  "wasm_size_kb": 514.7490234375,
+  "compilation_flags": "-O3",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}

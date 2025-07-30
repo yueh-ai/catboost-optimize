@@ -15,7 +15,7 @@ python generate_test_data.py
 cd ..
 
 # 3. Run an experiment
-./framework/experiment.sh models/baseline.cpp
+./framework/experiment.sh experiments/baseline_wrapper.cpp
 ```
 
 ## Features
@@ -34,16 +34,17 @@ catboost-optimize/
 │   ├── train_model.py         # Train CatBoost on Diamonds dataset
 │   └── generate_test_data.py  # Generate 1M test vectors
 ├── models/                     # Model files and test data
-│   ├── baseline.cpp           # CatBoost C++ export
+│   ├── baseline.cpp           # CatBoost C++ export (raw model)
 │   ├── baseline.cbm           # Native CatBoost model (ground truth)
 │   └── test_data.bin          # 1M test vectors (binary)
+├── experiments/               # Your optimized models go here
+│   ├── baseline_wrapper.cpp   # Wrapper for baseline model with catboostPredict
+│   └── example_simd.cpp      # Example optimization
 ├── framework/                  # Core experimentation tools
 │   ├── experiment.sh          # Main experiment runner
 │   ├── compile_wasm.js        # Emscripten wrapper
 │   ├── run_predictions.js     # WASM execution engine
 │   └── accuracy_checker.py    # Accuracy validation
-├── experiments/               # Your optimized models go here
-│   └── example_simd.cpp      # Example optimization
 └── results/                   # Experiment outputs
     └── experiment_*.json      # Detailed results
 ```
@@ -53,7 +54,7 @@ catboost-optimize/
 ### Basic Experiment
 
 ```bash
-# Test your optimized model
+# Test your optimized model (make sure it exports catboostPredict function)
 ./framework/experiment.sh experiments/my_optimized_model.cpp
 ```
 
@@ -79,9 +80,10 @@ python framework/visualize_results.py results/experiment_20240120_153045_report.
 
 ## Writing Optimizations
 
-1. Start with the baseline model in `models/baseline.cpp`
+1. Start with the baseline wrapper in `experiments/baseline_wrapper.cpp`
 2. Create your optimized version in `experiments/`
-3. Common optimizations to try:
+3. Ensure your model exports: `extern "C" float catboostPredict(const float* features, int featureCount)`
+4. Common optimizations to try:
    - SIMD vectorization
    - Loop unrolling
    - Memory access patterns
