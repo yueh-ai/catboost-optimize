@@ -1,0 +1,19 @@
+{
+  "experiment_name": "memory_opt_v1",
+  "cpp_file": "experiments/memory_optimized.cpp",
+  "timestamp": "2025-07-30T04:05:39.733Z",
+  "total_samples": 1000000,
+  "total_time_ms": 8804,
+  "worker_time_ms": 8655,
+  "predictions_per_second": 113584,
+  "speedup_vs_baseline": 1.239553435989218,
+  "wasm_size_bytes": 523478,
+  "wasm_size_kb": 511.208984375,
+  "compilation_flags": "-O3",
+  "accuracy": {
+    "max_error": 8034.435546875,
+    "mean_error": 1598.7329485473633,
+    "rmse": 2126.328242760522,
+    "exact_matches": 0
+  }
+}

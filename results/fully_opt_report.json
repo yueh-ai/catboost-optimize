@@ -1,0 +1,19 @@
+{
+  "experiment_name": "fully_opt",
+  "cpp_file": "experiments/fully_optimized.cpp",
+  "timestamp": "2025-07-30T04:11:58.076Z",
+  "total_samples": 1000000,
+  "total_time_ms": 8428,
+  "worker_time_ms": 8263,
+  "predictions_per_second": 118652,
+  "speedup_vs_baseline": 1.2948610216843277,
+  "wasm_size_bytes": 523403,
+  "wasm_size_kb": 511.1357421875,
+  "compilation_flags": "-O3 -msimd128 -ffast-math",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "experiment_name": "fully_opt_lto",
+  "cpp_file": "experiments/fully_optimized.cpp",
+  "timestamp": "2025-07-30T04:12:56.342Z",
+  "total_samples": 1000000,
+  "total_time_ms": 8636,
+  "worker_time_ms": 8501,
+  "predictions_per_second": 115794,
+  "speedup_vs_baseline": 1.2636713847631311,
+  "wasm_size_bytes": 513864,
+  "wasm_size_kb": 501.8203125,
+  "compilation_flags": "-O3 -msimd128 -ffast-math -flto",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "experiment_name": "memory_opt_v2",
+  "cpp_file": "experiments/memory_optimized.cpp",
+  "timestamp": "2025-07-30T04:06:37.226Z",
+  "total_samples": 1000000,
+  "total_time_ms": 10123,
+  "worker_time_ms": 10003,
+  "predictions_per_second": 98784,
+  "speedup_vs_baseline": 1.0780395708969477,
+  "wasm_size_bytes": 523478,
+  "wasm_size_kb": 511.208984375,
+  "compilation_flags": "-O3",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}

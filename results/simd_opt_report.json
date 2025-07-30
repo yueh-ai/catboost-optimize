@@ -1,0 +1,19 @@
+{
+  "experiment_name": "simd_opt",
+  "cpp_file": "experiments/simd_optimized.cpp",
+  "timestamp": "2025-07-30T04:09:46.157Z",
+  "total_samples": 1000000,
+  "total_time_ms": 8994,
+  "worker_time_ms": 8857,
+  "predictions_per_second": 111185,
+  "speedup_vs_baseline": 1.2133729115056802,
+  "wasm_size_bytes": 523259,
+  "wasm_size_kb": 510.9951171875,
+  "compilation_flags": "-O3 -msimd128",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}

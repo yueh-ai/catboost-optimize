@@ -1,0 +1,19 @@
+{
+  "experiment_name": "categorical_opt",
+  "cpp_file": "experiments/categorical_optimized.cpp",
+  "timestamp": "2025-07-30T04:08:19.314Z",
+  "total_samples": 1000000,
+  "total_time_ms": 10553,
+  "worker_time_ms": 10425,
+  "predictions_per_second": 94759,
+  "speedup_vs_baseline": 1.0341143474512458,
+  "wasm_size_bytes": 523853,
+  "wasm_size_kb": 511.5751953125,
+  "compilation_flags": "-O3",
+  "accuracy": {
+    "max_error": 0.0,
+    "mean_error": 0.0,
+    "rmse": 0.0,
+    "exact_matches": 1000
+  }
+}
