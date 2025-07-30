@@ -38,8 +38,8 @@ catboost-optimize/
 │   ├── baseline.cbm           # Native CatBoost model (ground truth)
 │   └── test_data.bin          # 1M test vectors (binary)
 ├── experiments/               # Your optimized models go here
-│   ├── baseline_wrapper.cpp   # Wrapper for baseline model with catboostPredict
-│   └── example_simd.cpp      # Example optimization
+│   ├── baseline_wrapper.cpp   # Wrapper for baseline model with catboostPredict export
+│   └── your_model.cpp        # Copy baseline_wrapper.cpp and add optimizations
 ├── framework/                  # Core experimentation tools
 │   ├── experiment.sh          # Main experiment runner
 │   ├── compile_wasm.js        # Emscripten wrapper
@@ -54,7 +54,11 @@ catboost-optimize/
 ### Basic Experiment
 
 ```bash
-# Test your optimized model (make sure it exports catboostPredict function)
+# Test the baseline model
+./framework/experiment.sh experiments/baseline_wrapper.cpp
+
+# Test your optimized model (must include wrapper that exports catboostPredict)
+# Copy baseline_wrapper.cpp as starting point and add your optimizations
 ./framework/experiment.sh experiments/my_optimized_model.cpp
 ```
 
@@ -80,9 +84,11 @@ python framework/visualize_results.py results/experiment_20240120_153045_report.
 
 ## Writing Optimizations
 
-1. Start with the baseline wrapper in `experiments/baseline_wrapper.cpp`
-2. Create your optimized version in `experiments/`
-3. Ensure your model exports: `extern "C" float catboostPredict(const float* features, int featureCount)`
+1. **Important**: Start by copying `experiments/baseline_wrapper.cpp` (NOT `models/baseline.cpp`)
+2. The wrapper handles:
+   - Converting categorical indices to strings for the model
+   - Exporting the required `catboostPredict` function
+3. Add your optimizations while keeping the wrapper structure
 4. Common optimizations to try:
    - SIMD vectorization
    - Loop unrolling
